@@ -1,0 +1,64 @@
+<html>
+  <head>
+    <title>Sound Garden</title>
+    <style>
+        html, body {
+            flow: vertical;
+            font-family: "IBM Plex Mono";
+            font-size: 16px;
+            background-color: #000000;
+            color: #00ff00;
+        }
+        #graph-text {
+            width: 1*;
+            height: 1*;
+            font-family: "IBM Plex Mono";
+            font-size: 16px;
+            border: 1px solid #ccc;
+            background-color: #000000;
+            color: #00ff00;
+        }
+        #graph-text-container {
+            flow: vertical;
+            width: 1*;
+            height: 7*;
+        }
+        #errors {
+            width: 1*;
+            height: 1*;
+            border: 1px solid #ccc;
+            background-color: #000000;
+            color: #ff0000;
+        }
+    </style>
+    <script type="text/tiscript">
+      view.caption = $(head > title).value;
+
+      // intercept event in sink phase on plaintext parent to prevent caret return insertion
+      event ~keydown $(#graph-text-container) (e) {
+          if (e.shiftKey && e.keyCode === Event.VK_RETURN) {
+              view.graph_text_change($(#graph-text).value);
+              return true;
+          }
+      }
+
+      namespace Editor {
+          function set_text(text) {
+              $(#graph-text).text = text;
+          }
+      }
+
+      namespace Error {
+          function report(msg) {
+              $(#errors).text = msg;
+          }
+      }
+    </script>
+  </head>
+<body>
+    <div #graph-text-container>
+        <textarea#graph-text></textarea>
+    </div>
+    <div#errors></div>
+</body>
+</html>

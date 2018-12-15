@@ -1,0 +1,20 @@
+[package]
+name = "sound-garden-vst"
+version = "0.1.0"
+authors = ["Ruslan Prokopchuk <fer.obbee@gmail.com>"]
+edition = "2018"
+
+[workspace]
+
+[dependencies]
+audio_graph = { path = "audio_graph"  }
+parking_lot = "0"
+sciter-rs = "0"
+vst = "0"
+
+[lib]
+name = "soundgarden"
+crate-type = ["cdylib"]
+
+[profile.release]
+lto = true
