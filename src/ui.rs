@@ -136,7 +136,7 @@ impl Handler {
         report_error(root, "");
         // TODO to autoformat or not to autoformat?
         let text = new_text.join("\n");
-        set_editor_text(root, &text);
+        // set_editor_text(root, &text);
         *self.text.lock() = text;
         *self.graph.lock() = g
     }
@@ -165,6 +165,7 @@ impl vst::editor::Editor for Editor {
         let hwnd = window as sciter::types::HWINDOW;
         let mut frame = sciter::Window::create(
             (0, 0, 400, 300),
+            // TODO try other flags
             sciter::types::SCITER_CREATE_WINDOW_FLAGS::SW_TOOL,
             Some(hwnd),
         );
