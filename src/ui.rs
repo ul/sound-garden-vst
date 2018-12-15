@@ -90,6 +90,7 @@ impl Handler {
                 "pan" => Box::new(Pan3::new(channels)),
                 "pan1" => Box::new(Pan1::new(channels)),
                 "pan2" => Box::new(Pan2::new(channels)),
+                "in" | "input" => Box::new(Input::new(channels)),
                 _ => match token.parse::<Sample>() {
                     Ok(x) => Box::new(Constant::new(channels, x)),
                     Err(_) => {

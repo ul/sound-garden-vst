@@ -39,7 +39,7 @@ impl Module for Feedback {
         let channels = self.channels;
 
         // feed output back to the delay module
-        self.delay_input[0..channels].clone_from_slice(&self.output);
+        self.delay_input[..channels].clone_from_slice(&self.output);
         // just copy delay time
         self.delay_input[channels..2 * channels].clone_from_slice(&input[channels..2 * channels]);
         self.delay.sample(&self.delay_input);

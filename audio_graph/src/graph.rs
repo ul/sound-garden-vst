@@ -63,16 +63,16 @@ impl AudioGraph {
             } else {
                 // If node does not have any inputs it might be waiting for external input.
                 // Yes, black magic.
-                self.input[0..channels].clone_from_slice(input);
+                self.input[..channels].clone_from_slice(input);
             }
             g[idx].sample(&self.input);
         }
-        if !self.order.is_empty() {
-            &self.graph[self.order[self.order.len() - 1]].output()
-        } else {
+        if self.order.is_empty() {
             // This might be a garbage, we just don't care what to return from empty graph
             // and don't want to allocate any extra resources for such case.
             &self.input
+        } else {
+            &self.graph[self.order[self.order.len() - 1]].output()
         }
     }
 

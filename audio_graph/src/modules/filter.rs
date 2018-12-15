@@ -78,6 +78,6 @@ impl Module for HPF {
             let a = 1.0 / (k + 1.0);
             *value = a * (*value + x - x_prime);
         }
-        self.x_prime.clone_from_slice(&input[0..channels]);
+        self.x_prime.clone_from_slice(&input[..channels]);
     }
 }

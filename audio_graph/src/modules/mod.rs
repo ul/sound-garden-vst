@@ -7,6 +7,7 @@ pub mod delay;
 pub mod feedback;
 pub mod filter;
 pub mod function;
+pub mod input;
 pub mod noise;
 pub mod osc;
 pub mod pan;
