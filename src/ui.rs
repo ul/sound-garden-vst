@@ -150,24 +150,25 @@ impl EventHandler for Handler {
 
 impl vst::editor::Editor for Editor {
     fn size(&self) -> (i32, i32) {
-        (400, 300)
+        (0, 0)
     }
 
     fn position(&self) -> (i32, i32) {
         (0, 0)
     }
 
-    fn open(&mut self, window: *mut c_void) {
+    fn open(&mut self, _window: *mut c_void) {
         if self.is_open() {
             self.frame.as_ref().unwrap().expand(false);
             return;
         }
-        let hwnd = window as sciter::types::HWINDOW;
+        // let hwnd = window as sciter::types::HWINDOW;
         let mut frame = sciter::Window::create(
-            (0, 0, 400, 300),
-            // TODO try other flags
-            sciter::types::SCITER_CREATE_WINDOW_FLAGS::SW_TOOL,
-            Some(hwnd),
+            (0, 0, 400, 800),
+            sciter::types::SCITER_CREATE_WINDOW_FLAGS::SW_TITLEBAR
+                | sciter::types::SCITER_CREATE_WINDOW_FLAGS::SW_RESIZEABLE,
+            // Some(hwnd),
+            None,
         );
         let handler = Handler {
             context: self.context.clone(),

@@ -63,6 +63,28 @@ impl Plugin for SoundGarden {
         self.context.lock().sample_rate = rate as usize;
     }
 
+    fn process(&mut self, buffer: &mut vst::buffer::AudioBuffer<f32>) {
+        let (inputs, mut outputs) = buffer.split();
+
+        // Iterate over inputs as (&f32, &f32)
+        let (left, right) = inputs.split_at(1);
+        let stereo_in = left[0].iter().zip(right[0].iter());
+
+        // Iterate over outputs as (&mut f32, &mut f32)
+        let (mut left, mut right) = outputs.split_at_mut(1);
+        let stereo_out = left[0].iter_mut().zip(right[0].iter_mut());
+
+        // Zip and process
+        let mut g = self.graph.lock();
+        for ((left_in, right_in), (left_out, right_out)) in stereo_in.zip(stereo_out) {
+            self.input[0] = Sample::from(*left_in);
+            self.input[1] = Sample::from(*right_in);
+            let output = g.sample(&self.input);
+            *left_out = output[0] as f32;
+            *right_out = output[1] as f32;
+        }
+    }
+
     fn process_f64(&mut self, buffer: &mut vst::buffer::AudioBuffer<f64>) {
         let (inputs, mut outputs) = buffer.split();
 
