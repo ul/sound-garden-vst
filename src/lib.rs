@@ -1,8 +1,4 @@
 use crate::context::Context;
-/// TODO
-///
-/// * fix crash when edito window was closed manually
-///
 use audio_graph::prelude::*;
 use parking_lot::Mutex;
 use std::sync::Arc;

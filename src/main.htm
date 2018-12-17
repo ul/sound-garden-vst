@@ -32,27 +32,27 @@
         }
     </style>
     <script type="text/tiscript">
-      view.caption = $(head > title).value;
+        view.caption = $(head > title).value;
 
-      // intercept event in sink phase on plaintext parent to prevent caret return insertion
-      event ~keydown $(#graph-text-container) (e) {
-          if (e.shiftKey && e.keyCode === Event.VK_RETURN) {
-              view.graph_text_change($(#graph-text).value);
-              return true;
-          }
-      }
+        // intercept event in sink phase on plaintext parent to prevent caret return insertion
+        event ~keydown $(#graph-text-container) (e) {
+            if (e.shiftKey && e.keyCode === Event.VK_RETURN) {
+                view.graph_text_change($(#graph-text).value);
+                return true;
+            }
+        }
 
-      namespace Editor {
-          function set_text(text) {
-              $(#graph-text).text = text;
-          }
-      }
+        namespace Editor {
+            function set_text(text) {
+                $(#graph-text).text = text;
+            }
+        }
 
-      namespace Error {
-          function report(msg) {
-              $(#errors).text = msg;
-          }
-      }
+        namespace Error {
+            function report(msg) {
+                $(#errors).text = msg;
+            }
+        }
     </script>
   </head>
 <body>

@@ -1,7 +1,7 @@
 use crate::context::Context;
 use audio_graph::prelude::*;
 use parking_lot::Mutex;
-use sciter::{make_args, Element, EventHandler};
+use sciter::{self, make_args, Element};
 use std::os::raw::c_void;
 use std::sync::Arc;
 use vst;
@@ -12,6 +12,7 @@ pub struct Editor {
     context: Arc<Mutex<Context>>,
     graph: Arc<Mutex<AudioGraph>>,
     frame: Option<sciter::window::Window>,
+    is_open: Arc<Mutex<bool>>,
     text: Arc<Mutex<String>>,
 }
 
@@ -21,15 +22,20 @@ impl Editor {
             context,
             graph,
             frame: None,
+            is_open: Arc::new(Mutex::new(false)),
             text: Arc::new(Mutex::new("".to_string())),
         }
     }
 }
 
-struct Handler {
+struct EventHandler {
     context: Arc<Mutex<Context>>,
     graph: Arc<Mutex<AudioGraph>>,
     text: Arc<Mutex<String>>,
+}
+
+struct HostHandler {
+    is_open: Arc<Mutex<bool>>,
 }
 
 fn report_error(root: &Element, msg: &str) {
@@ -50,7 +56,7 @@ fn set_editor_text(root: &Element, text: &str) {
     };
 }
 
-impl Handler {
+impl EventHandler {
     fn graph_text_change(&mut self, root: &Element, text: String) {
         let context = self.context.lock();
         let channels = context.channels;
@@ -176,9 +182,15 @@ impl Handler {
     }
 }
 
-impl EventHandler for Handler {
+impl sciter::EventHandler for EventHandler {
     dispatch_script_call! {
         fn graph_text_change(String);
+    }
+}
+
+impl sciter::HostHandler for HostHandler {
+    fn on_engine_destroyed(&mut self) {
+        *self.is_open.lock() = false;
     }
 }
 
@@ -196,30 +208,33 @@ impl vst::editor::Editor for Editor {
             self.frame.as_ref().unwrap().expand(false);
             return;
         }
-        // let hwnd = window as sciter::types::HWINDOW;
         let mut frame = sciter::Window::create(
             (0, 0, 400, 800),
             sciter::types::SCITER_CREATE_WINDOW_FLAGS::SW_TITLEBAR
                 | sciter::types::SCITER_CREATE_WINDOW_FLAGS::SW_RESIZEABLE,
-            // Some(hwnd),
             None,
         );
-        let handler = Handler {
+        let event_handler = EventHandler {
             context: self.context.clone(),
             graph: self.graph.clone(),
             text: self.text.clone(),
         };
-        frame.event_handler(handler);
+        frame.event_handler(event_handler);
+        let host_handler = HostHandler {
+            is_open: self.is_open.clone(),
+        };
+        frame.sciter_handler(host_handler);
         frame.load_html(HTML, None);
         frame.expand(false);
         if let Ok(root) = Element::from_window(frame.get_hwnd()) {
             set_editor_text(&root, &self.text.lock());
         }
         self.frame = Some(frame);
+        *self.is_open.lock() = true;
     }
 
     fn is_open(&mut self) -> bool {
-        self.frame.is_some()
+        *self.is_open.lock()
     }
 
     fn close(&mut self) {
@@ -228,5 +243,6 @@ impl vst::editor::Editor for Editor {
         }
         let frame = self.frame.take();
         frame.unwrap().dismiss();
+        *self.is_open.lock() = false;
     }
 }
