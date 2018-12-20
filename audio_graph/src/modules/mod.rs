@@ -11,6 +11,7 @@ pub mod input;
 pub mod noise;
 pub mod osc;
 pub mod pan;
+pub mod parameter;
 pub mod phasor;
 pub mod prelude;
 pub mod pulse;

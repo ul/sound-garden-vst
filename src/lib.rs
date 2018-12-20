@@ -10,12 +10,14 @@ mod macros;
 mod ui;
 
 const CHANNELS: usize = 2;
+const PARAMETERS: usize = 16;
 
 struct SoundGarden {
     context: Arc<Mutex<Context>>,
+    editor: ui::Editor,
     graph: Arc<Mutex<AudioGraph>>,
     input: Vec<Sample>,
-    editor: ui::Editor,
+    parameters: Vec<f64>,
 }
 
 impl Default for SoundGarden {
@@ -23,14 +25,16 @@ impl Default for SoundGarden {
         let context = Arc::new(Mutex::new(Context {
             channels: CHANNELS,
             sample_rate: 48_000,
+            parameters: PARAMETERS,
         }));
-        let graph = Arc::new(Mutex::new(AudioGraph::new(CHANNELS)));
+        let graph = Arc::new(Mutex::new(AudioGraph::new(CHANNELS, PARAMETERS)));
         let editor = ui::Editor::new(context.clone(), graph.clone());
         SoundGarden {
-            editor,
             context,
+            editor,
             graph,
-            input: vec![0.0; CHANNELS],
+            input: vec![0.0; CHANNELS + PARAMETERS],
+            parameters: vec![0.0; PARAMETERS],
         }
     }
 }
@@ -44,7 +48,7 @@ impl Plugin for SoundGarden {
             inputs: CHANNELS as i32,
             outputs: CHANNELS as i32,
             f64_precision: true,
-            // parameters: 6, // param:<N>
+            parameters: PARAMETERS as i32, // param:<N>
             version: 1,
             category: vst::plugin::Category::Synth,
             ..Default::default()
@@ -59,6 +63,24 @@ impl Plugin for SoundGarden {
         self.context.lock().sample_rate = rate as usize;
     }
 
+    fn can_be_automated(&self, _index: i32) -> bool {
+        true
+    }
+
+    fn get_parameter(&self, index: i32) -> f32 {
+        if index < PARAMETERS as i32 {
+            self.parameters[index as usize] as f32
+        } else {
+            0.0
+        }
+    }
+
+    fn set_parameter(&mut self, index: i32, value: f32) {
+        if index < PARAMETERS as i32 {
+            self.parameters[index as usize] = Sample::from(value);
+        }
+    }
+
     fn process(&mut self, buffer: &mut vst::buffer::AudioBuffer<f32>) {
         let (inputs, mut outputs) = buffer.split();
 
@@ -70,8 +92,11 @@ impl Plugin for SoundGarden {
         let (mut left, mut right) = outputs.split_at_mut(1);
         let stereo_out = left[0].iter_mut().zip(right[0].iter_mut());
 
-        // Zip and process
+        // Prepare parameters and graph
+        self.input[CHANNELS..].clone_from_slice(&self.parameters);
         let mut g = self.graph.lock();
+
+        // Zip and process
         for ((left_in, right_in), (left_out, right_out)) in stereo_in.zip(stereo_out) {
             self.input[0] = Sample::from(*left_in);
             self.input[1] = Sample::from(*right_in);
@@ -92,8 +117,11 @@ impl Plugin for SoundGarden {
         let (mut left, mut right) = outputs.split_at_mut(1);
         let stereo_out = left[0].iter_mut().zip(right[0].iter_mut());
 
-        // Zip and process
+        // Prepare parameters and graph
+        self.input[CHANNELS..].clone_from_slice(&self.parameters);
         let mut g = self.graph.lock();
+
+        // Zip and process
         for ((left_in, right_in), (left_out, right_out)) in stereo_in.zip(stereo_out) {
             self.input[0] = *left_in;
             self.input[1] = *right_in;

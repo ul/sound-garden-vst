@@ -11,5 +11,6 @@ pub use crate::modules::input::Input;
 pub use crate::modules::noise::Noise;
 pub use crate::modules::osc::{Osc, OscPhase};
 pub use crate::modules::pan::{Pan1, Pan2, Pan3};
+pub use crate::modules::parameter::Parameter;
 pub use crate::modules::phasor::{Phasor, Phasor0};
 pub use crate::modules::pulse::Pulse;

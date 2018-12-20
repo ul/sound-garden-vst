@@ -63,7 +63,7 @@ impl EventHandler {
         let sample_rate = context.sample_rate;
         let mut nodes = Vec::new();
         let mut tokens = Vec::new();
-        let mut g = AudioGraph::new(channels);
+        let mut g = AudioGraph::new(channels, context.parameters);
         for token in text.split_whitespace() {
             let node: Option<Node> = match token {
                 "s" => Some(Box::new(Osc::new(channels, sample_rate, sine))),
@@ -103,7 +103,19 @@ impl EventHandler {
                 "in" | "input" => Some(Box::new(Input::new(channels))),
                 _ => match token.parse::<Sample>() {
                     Ok(x) => Some(Box::new(Constant::new(channels, x))),
-                    Err(_) => None,
+                    Err(_) => {
+                        let subcmd = token.split(':').collect::<Vec<_>>();
+                        match subcmd[0] {
+                            "param" => match subcmd.get(1) {
+                                Some(x) => match x.parse::<usize>() {
+                                    Ok(index) => Some(Box::new(Parameter::new(channels, index))),
+                                    Err(_) => None,
+                                },
+                                None => None,
+                            },
+                            _ => None,
+                        }
+                    }
                 },
             };
             nodes.push(node.and_then(|node| Some(g.add_node(node))));

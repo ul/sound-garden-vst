@@ -18,6 +18,7 @@ pub struct AudioGraph {
     /// `sample` walks graph in topological order which is cached here.
     order: Vec<NodeIndex>,
     space: DfsSpace<NodeIndex, FixedBitSet>,
+    parameters: usize,
 }
 
 /// Maximum number of sources to connect to sink.
@@ -27,7 +28,7 @@ pub struct AudioGraph {
 const MAX_SOURCES: usize = 16;
 
 impl AudioGraph {
-    pub fn new(channels: usize) -> Self {
+    pub fn new(channels: usize, parameters: usize) -> Self {
         let graph = StableGraph::default();
         let space = DfsSpace::new(&graph);
         let input_len = channels * MAX_SOURCES;
@@ -37,6 +38,7 @@ impl AudioGraph {
             input: vec![0.0; input_len],
             order: Vec::new(),
             space,
+            parameters,
         }
     }
 
@@ -61,9 +63,9 @@ impl AudioGraph {
                     self.input[offset..(offset + channels)].clone_from_slice(g[source].output());
                 }
             } else {
-                // If node does not have any inputs it might be waiting for external input.
+                // If node does not have any inputs it might be waiting for external input and parameters.
                 // Yes, black magic.
-                self.input[..channels].clone_from_slice(input);
+                self.input[..(channels + self.parameters)].clone_from_slice(input);
             }
             g[idx].sample(&self.input);
         }
