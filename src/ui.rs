@@ -101,6 +101,11 @@ impl EventHandler {
                 "pan1" => Some(Box::new(Pan1::new(channels))),
                 "pan2" => Some(Box::new(Pan2::new(channels))),
                 "in" | "input" => Some(Box::new(Input::new(channels))),
+                "cheb2" => Some(Box::new(Fn1::new(channels, cheb2))),
+                "cheb3" => Some(Box::new(Fn1::new(channels, cheb3))),
+                "cheb4" => Some(Box::new(Fn1::new(channels, cheb4))),
+                "cheb5" => Some(Box::new(Fn1::new(channels, cheb5))),
+                "cheb6" => Some(Box::new(Fn1::new(channels, cheb6))),
                 _ => match token.parse::<Sample>() {
                     Ok(x) => Some(Box::new(Constant::new(channels, x))),
                     Err(_) => {
