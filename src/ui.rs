@@ -77,6 +77,8 @@ impl EventHandler {
                 "-" => Some(Box::new(Fn2::new(channels, sub))),
                 "*" => Some(Box::new(Fn2::new(channels, mul))),
                 "/" => Some(Box::new(Fn2::new(channels, div))),
+                "\\" => Some(Box::new(Fn1::new(channels, recip))),
+                "^" | "pow" => Some(Box::new(Fn2::new(channels, pow))),
                 "unit" => Some(Box::new(Fn1::new(channels, unit))),
                 "r" | "range" => Some(Box::new(Fn3::new(channels, range))),
                 "n" | "noise" => Some(Box::new(Noise::new(channels))),
@@ -96,6 +98,7 @@ impl EventHandler {
                 ))),
                 "m2f" | "midi2freq" => Some(Box::new(Fn1::new(channels, midi2freq))),
                 "round" => Some(Box::new(Fn1::new(channels, round))),
+                "quantize" => Some(Box::new(Fn2::new(channels, quantize))),
                 "sin" => Some(Box::new(Fn1::new(channels, sin))),
                 "pan" => Some(Box::new(Pan3::new(channels))),
                 "pan1" => Some(Box::new(Pan1::new(channels))),
@@ -106,6 +109,11 @@ impl EventHandler {
                 "cheb4" => Some(Box::new(Fn1::new(channels, cheb4))),
                 "cheb5" => Some(Box::new(Fn1::new(channels, cheb5))),
                 "cheb6" => Some(Box::new(Fn1::new(channels, cheb6))),
+                "sh" | "sample&hold" => Some(Box::new(SampleAndHold::new(channels))),
+                "m" | "metro" => Some(Box::new(Metro::new(channels, sample_rate))),
+                "dm" | "dmetro" => Some(Box::new(DMetro::new(channels, sample_rate))),
+                "mh" | "metroHold" => Some(Box::new(MetroHold::new(channels, sample_rate))),
+                "dmh" | "dmetroHold" => Some(Box::new(DMetroHold::new(channels, sample_rate))),
                 _ => match token.parse::<Sample>() {
                     Ok(x) => Some(Box::new(Constant::new(channels, x))),
                     Err(_) => {

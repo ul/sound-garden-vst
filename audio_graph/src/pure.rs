@@ -23,6 +23,19 @@ pub fn div(x: Sample, y: Sample) -> Sample {
     x / y
 }
 
+pub fn pow(x: Sample, y: Sample) -> Sample {
+    x.powf(y)
+}
+
+pub fn recip(x: Sample) -> Sample {
+    x.recip()
+}
+
+/// Round `x` to the nearest `step` multiplicative.
+pub fn quantize(x: Sample, step: Sample) -> Sample {
+    (x / step).round() * step
+}
+
 // Trigonometry
 
 pub fn sin(x: Sample) -> Sample {
