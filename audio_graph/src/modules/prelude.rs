@@ -16,3 +16,5 @@ pub use crate::modules::parameter::Parameter;
 pub use crate::modules::phasor::{Phasor, Phasor0};
 pub use crate::modules::pulse::Pulse;
 pub use crate::modules::sample_and_hold::SampleAndHold;
+pub use crate::modules::yin::Yin;
+pub use crate::modules::zip::Zip;

@@ -4,7 +4,7 @@ use crate::sample::{Frame, Sample};
 pub struct Metro {
     output: Vec<Sample>,
     last_trigger: Vec<u64>,
-    sample_number: u64,
+    frame_number: u64,
     sample_rate: Sample,
 }
 
@@ -13,7 +13,7 @@ impl Metro {
         Metro {
             output: vec![0.0; channels],
             last_trigger: vec![0; channels],
-            sample_number: 0,
+            frame_number: 0,
             sample_rate: sample_rate as Sample,
         }
     }
@@ -37,21 +37,21 @@ impl Module for Metro {
         {
             let frequency = input[channel];
             let delta = self.sample_rate / frequency;
-            *output = if delta as u64 <= self.sample_number - *last_trigger {
-                *last_trigger = self.sample_number;
+            *output = if delta as u64 <= self.frame_number - *last_trigger {
+                *last_trigger = self.frame_number;
                 1.0
             } else {
                 0.0
             };
         }
-        self.sample_number += 1;
+        self.frame_number += 1;
     }
 }
 
 pub struct DMetro {
     output: Vec<Sample>,
     last_trigger: Vec<u64>,
-    sample_number: u64,
+    frame_number: u64,
     sample_rate: Sample,
 }
 
@@ -60,7 +60,7 @@ impl DMetro {
         DMetro {
             output: vec![0.0; channels],
             last_trigger: vec![0; channels],
-            sample_number: 0,
+            frame_number: 0,
             sample_rate: sample_rate as Sample,
         }
     }
@@ -84,14 +84,14 @@ impl Module for DMetro {
         {
             let dt = input[channel];
             let delta = self.sample_rate * dt;
-            *output = if delta as u64 <= self.sample_number - *last_trigger {
-                *last_trigger = self.sample_number;
+            *output = if delta as u64 <= self.frame_number - *last_trigger {
+                *last_trigger = self.frame_number;
                 1.0
             } else {
                 0.0
             };
         }
-        self.sample_number += 1;
+        self.frame_number += 1;
     }
 }
 
@@ -99,7 +99,7 @@ pub struct MetroHold {
     output: Vec<Sample>,
     frequencies: Vec<Sample>,
     last_trigger: Vec<u64>,
-    sample_number: u64,
+    frame_number: u64,
     sample_rate: Sample,
 }
 
@@ -109,7 +109,7 @@ impl MetroHold {
             output: vec![0.0; channels],
             frequencies: vec![0.0; channels],
             last_trigger: vec![0; channels],
-            sample_number: 0,
+            frame_number: 0,
             sample_rate: sample_rate as Sample,
         }
     }
@@ -137,15 +137,15 @@ impl Module for MetroHold {
                 *last_frequency = frequency
             }
             let delta = self.sample_rate / *last_frequency;
-            *output = if delta as u64 <= self.sample_number - *last_trigger {
-                *last_trigger = self.sample_number;
+            *output = if delta as u64 <= self.frame_number - *last_trigger {
+                *last_trigger = self.frame_number;
                 *last_frequency = frequency;
                 1.0
             } else {
                 0.0
             };
         }
-        self.sample_number += 1;
+        self.frame_number += 1;
     }
 }
 
@@ -153,7 +153,7 @@ pub struct DMetroHold {
     output: Vec<Sample>,
     dts: Vec<Sample>,
     last_trigger: Vec<u64>,
-    sample_number: u64,
+    frame_number: u64,
     sample_rate: Sample,
 }
 
@@ -163,7 +163,7 @@ impl DMetroHold {
             output: vec![0.0; channels],
             dts: vec![0.0; channels],
             last_trigger: vec![0; channels],
-            sample_number: 0,
+            frame_number: 0,
             sample_rate: sample_rate as Sample,
         }
     }
@@ -191,14 +191,14 @@ impl Module for DMetroHold {
                 *last_dt = dt
             }
             let delta = self.sample_rate * *last_dt;
-            *output = if delta as u64 <= self.sample_number - *last_trigger {
-                *last_trigger = self.sample_number;
+            *output = if delta as u64 <= self.frame_number - *last_trigger {
+                *last_trigger = self.frame_number;
                 *last_dt = dt;
                 1.0
             } else {
                 0.0
             };
         }
-        self.sample_number += 1;
+        self.frame_number += 1;
     }
 }

@@ -100,6 +100,7 @@ impl EventHandler {
                 "round" => Some(Box::new(Fn1::new(channels, round))),
                 "quantize" => Some(Box::new(Fn2::new(channels, quantize))),
                 "sin" => Some(Box::new(Fn1::new(channels, sin))),
+                "cos" => Some(Box::new(Fn1::new(channels, cos))),
                 "pan" => Some(Box::new(Pan3::new(channels))),
                 "pan1" => Some(Box::new(Pan1::new(channels))),
                 "pan2" => Some(Box::new(Pan2::new(channels))),
@@ -114,6 +115,8 @@ impl EventHandler {
                 "dm" | "dmetro" => Some(Box::new(DMetro::new(channels, sample_rate))),
                 "mh" | "metroHold" => Some(Box::new(MetroHold::new(channels, sample_rate))),
                 "dmh" | "dmetroHold" => Some(Box::new(DMetroHold::new(channels, sample_rate))),
+                "yin" | "pitch" => Some(Box::new(Yin::new(channels, sample_rate, 1024, 512, 0.2))),
+                "zip" => Some(Box::new(Zip::new(channels))),
                 _ => match token.parse::<Sample>() {
                     Ok(x) => Some(Box::new(Constant::new(channels, x))),
                     Err(_) => {

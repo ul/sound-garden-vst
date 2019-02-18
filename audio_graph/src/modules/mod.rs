@@ -17,3 +17,5 @@ pub mod phasor;
 pub mod prelude;
 pub mod pulse;
 pub mod sample_and_hold;
+pub mod yin;
+pub mod zip;
